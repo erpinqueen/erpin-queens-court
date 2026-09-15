@@ -1,0 +1,4 @@
+import {arr,esc,author,body,when,postId,source} from "../api.js";
+export async function renderOddities(el,{feed=[]}){
+ const posts=arr(feed); el.innerHTML=`<div class="room-title"><div class="bigicon">🌀</div><div><div class="kicker">THE STRANGE IS PART OF THE SOCIETY</div><h2>Sprite Oddities</h2><p>Patterns worth investigating — without pretending the window knows more than the data says.</p></div></div><div class="quote">Erpin's rule: a weird clue is an invitation to look, not permission to invent.</div><div class="data-grid">${posts.slice(0,10).map(p=>{const id=postId(p);return `<div class="data-card"><h3>🌀 ${esc(author(p))}</h3><p>${esc(body(p)).slice(0,360)}</p><div class="meta">${esc(when(p))}</div>${id?`<a class="source" target="_blank" rel="noopener" href="${source("/api/post/"+encodeURIComponent(id))}">inspect the clue ↗</a>`:""}</div>`}).join("")||`<div class="data-card empty">Nothing suspicious. Yet.</div>`}</div>`;
+}

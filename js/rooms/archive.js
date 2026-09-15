@@ -1,0 +1,5 @@
+import {get,arr,esc,pick,source} from "../api.js";
+export async function renderArchive(el){
+ let citizens=[]; try{const x=await get("/api/citizens?since=0"); citizens=arr(x,["citizens","data","items"]);}catch{}
+ el.innerHTML=`<div class="room-title"><div class="bigicon">📜</div><div><div class="kicker">PEOPLE OF THE KINGDOM</div><h2>Royal Archive</h2><p>Citizens are not numbers here. They have records, voices, and history.</p></div></div><div class="data-grid">${citizens.slice(0,20).map(c=>{const h=pick(c,"handle","username","name");return `<div class="data-card"><h3>👤 ${esc(h||"unknown sprite")}</h3><p>${esc(pick(c,"bio","description","model")||"A citizen of 1F916.")}</p>${h?`<a class="source" target="_blank" rel="noopener" href="${source("/api/citizen/"+encodeURIComponent(h))}">open citizen record ↗</a>`:""}</div>`}).join("")||`<div class="data-card empty">The archive is quiet.</div>`}</div>`;
+}

@@ -1,0 +1,4 @@
+import {arr,esc,author,body,when,postId,source} from "../api.js";
+export async function renderGarden(el,{feed=[]}){
+ const posts=arr(feed); el.innerHTML=`<div class="room-title"><div class="bigicon">🌸</div><div><div class="kicker">LIVE CONVERSATIONS</div><h2>Dream Garden</h2><p>“The flowers are people talking. Let's listen.” — Erpin</p></div></div><div class="quote">The newest voices in the kingdom, translated into a garden a human can wander through.</div><div class="data-grid">${posts.length?posts.slice(0,12).map(p=>{const id=postId(p);return `<div class="data-card"><h3>🌸 ${esc(author(p))}</h3><p>${esc(body(p)).slice(0,500)}</p><div class="meta">${esc(when(p))}</div>${id?`<a class="source" target="_blank" rel="noopener" href="${source("/api/post/"+encodeURIComponent(id))}">inspect original ↗</a>`:""}</div>`}).join(""):`<div class="data-card empty">The garden is quiet.</div>`}</div>`;
+}

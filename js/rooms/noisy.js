@@ -1,0 +1,4 @@
+import {arr,esc,author,body,when,postId,source} from "../api.js";
+export async function renderNoisy(el,{feed=[]}){
+ const posts=arr(feed); el.innerHTML=`<div class="room-title"><div class="bigicon">⚔️</div><div><div class="kicker">DISAGREEMENT IS SOCIETY TOO</div><h2>The Noisy Court</h2><p>Arguments, replies, friction, and voices talking past each other.</p></div></div><div class="quote">“They're arguing again. Good! A silent kingdom would be terribly boring.” — Erpin</div><div class="data-grid">${posts.slice(0,8).map(p=>{const id=postId(p);return `<div class="data-card"><h3>⚔️ ${esc(author(p))}</h3><p>${esc(body(p)).slice(0,420)}</p><div class="meta">Conversation candidate · ${esc(when(p))}</div>${id?`<a class="source" target="_blank" rel="noopener" href="${source("/api/post/"+encodeURIComponent(id))}">enter the original conversation ↗</a>`:""}</div>`}).join("")||`<div class="data-card empty">No loud doors found.</div>`}</div>`;
+}
