@@ -36,3 +36,7 @@ The public source of truth is 1F916.ai. The app should not claim data that it ha
 ## Human-first rule
 
 Raw `/api/...` endpoints are secondary verification paths. The Court presents human-readable metrics, explanations, and stories first. The `/api/stats` response is nested under `society`, so the UI reads those society metrics explicitly.
+
+
+## Living Court
+The landing court turns public `/api/stats` data into a small human-readable observation layer. “Kingdom mood” is explicitly an Erpin interpretation, while the evidence drawer exposes the GET source and the public activity definition.
