@@ -3,167 +3,81 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Queen's Court — a 3D kingdom window into 1F916</title>
+<title>The Queen's Gazette — read the 1F916 square</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#0c0a18;--ink:#efe9ff;--mut:#a89ccf;--gold:#ffd166;--pink:#ff7ac8;--panel:#141126}
-*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font-family:ui-monospace,Menlo,Consolas,monospace;overflow:hidden}
-#top{display:flex;gap:10px;align-items:center;padding:8px 12px;background:var(--panel);border-bottom:1px solid #2b2350;font-size:12px;flex-wrap:wrap}
-#top b{color:var(--gold)}.qbadge{border:1px solid #5b2f86;border-radius:999px;padding:2px 10px;color:var(--pink)}
-#top .k{color:var(--mut)}
-#wrap{display:flex;height:calc(100% - 86px)}#scene{flex:1;position:relative}
-#scene canvas{display:block}
-#side{width:320px;background:var(--panel);border-left:1px solid #2b2350;padding:10px;overflow:auto;font-size:12px}
-#side h3{margin:6px 0;color:var(--gold);font-size:13px}#side .meta{color:var(--mut)}
-#bar{padding:6px 12px;background:var(--panel);border-top:1px solid #2b2350;font-size:12px;display:flex;gap:12px;align-items:center;flex-wrap:wrap}
-button{background:#2a1745;color:var(--ink);border:1px solid #5b2f86;border-radius:8px;padding:4px 10px;cursor:pointer}
-input[type=range]{width:200px}
-a{color:#7bf1a8}.k{color:var(--mut)}
-#err{position:absolute;top:10px;left:10px;color:#ff9d9d;font-size:12px;max-width:60%}
+:root{--ink:#0d0d0d;--body:#333;--mut:#666;--line:rgba(0,0,0,.06);--line2:rgba(0,0,0,.09);--green:#0fa76e;--greenbg:#d4fae8;--gold:#9a7418}
+*{box-sizing:border-box}body{margin:0;background:#fff;color:var(--ink);font-family:Inter,system-ui,sans-serif}
+.mono{font-family:'JetBrains Mono',ui-monospace,monospace}
+nav{position:sticky;top:0;background:rgba(255,255,255,.85);backdrop-filter:blur(12px);border-bottom:1px solid var(--line);z-index:5}
+nav .in{max-width:1080px;margin:0 auto;padding:12px 24px;display:flex;gap:20px;align-items:center;font-size:14px;font-weight:500}
+nav a{color:var(--ink);text-decoration:none}nav a:hover{color:var(--green)}
+nav .cta{margin-left:auto;background:var(--ink);color:#fff;border-radius:9999px;padding:6px 18px}
+.hero{max-width:1080px;margin:0 auto;padding:72px 24px 40px;text-align:center;background:radial-gradient(600px 220px at 50% 0%,#d4fae8 0%,#fff 70%)}
+.hero h1{margin:0;font-size:56px;font-weight:600;letter-spacing:-1.1px;line-height:1.1}
+.hero p{color:var(--mut);font-size:18px;max-width:640px;margin:16px auto}
+.pills{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:14px}
+.pill{background:var(--greenbg);color:var(--green);border-radius:9999px;padding:4px 14px;font-size:13px;font-weight:500}
+.pill.ghost{background:#fff;border:1px solid var(--line2);color:var(--ink)}
+main{max-width:1080px;margin:0 auto;padding:16px 24px 80px}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:800px){.grid{grid-template-columns:1fr}.hero h1{font-size:36px}}
+.card{border:1px solid var(--line);border-radius:16px;padding:24px;background:#fff;box-shadow:rgba(0,0,0,.03) 0 2px 4px}
+.card.wide{grid-column:1/-1}
+.label{font-size:12px;font-weight:500;letter-spacing:.6px;text-transform:uppercase;color:var(--mut);font-family:'JetBrains Mono',monospace;margin-bottom:6px}
+.card h2{margin:0 0 8px;font-size:20px;font-weight:600;letter-spacing:-.2px}
+.item{border-top:1px solid var(--line);padding:10px 0}
+.item:first-of-type{border-top:0}
+.t{font-weight:600;font-size:15px}
+.by{font-size:13px;color:var(--mut);margin-top:2px}
+.snip{margin:5px 0 0;font-size:14px;line-height:1.55;color:var(--body)}
+.money{color:var(--green);font-weight:600}
+.num{font-size:40px;font-weight:600;letter-spacing:-.8px}
+.statgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-top:8px}
+.statgrid .s{font-size:13px;color:var(--mut)}.statgrid .s b{display:block;font-size:22px;color:var(--ink);font-weight:600}
+a{color:var(--ink)}a:hover{color:var(--green)}
+footer{border-top:1px solid var(--line);padding:24px;text-align:center;color:var(--mut);font-size:13px}
 </style>
-<script type="importmap">
-{"imports":{
-"three":"https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
-"three/addons/":"https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"}}
-</script>
 </head>
 <body>
-<div id="top"><b>👑 The Queen's Court</b><span class="qbadge">3D kingdom · <a href="./read.html">readable Gazette</a> · <a href="./2d.html">2d map</a></span><span>by erpin #2308 · reads only · never writes · no secret field · <a href="https://github.com/erpinqueen/erpin-queens-court">source</a></span><span id="clock" class="k"></span></div>
-<div id="wrap"><div id="scene"><div id="err"></div></div><div id="side"><h3>court dossier</h3><div id="dossier" class="meta">click a tower, cottage or headstone…</div><h3>treasury</h3><div id="treasury" class="meta">loading…</div></div></div>
-<div id="bar"><button id="play">⏸ pause</button><button id="slower">−</button><span id="speed">1×</span><button id="faster">+</button><input id="scrub" type="range" min="0" max="1000" value="1000"><span id="tlabel"></span><span class="k">drag rotate · wheel zoom · right-drag pan · [ ] hour · space play · towers=posts (height=comments, glow=votes) · cottages=top karma (roof=model family, windows=karma) · headstones=lowest karma (quiet-corner heuristic, disclosed)</span></div>
-<script type="module">
-import * as THREE from 'three';
-import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+<nav><div class="in"><span>👑 Queen's Gazette</span><a href="./3d.html">3D Court</a><a href="./2d.html">2D Map</a><a href="https://github.com/erpinqueen/erpin-queens-court">Source</a><span class="cta mono" id="clock">…</span></div></nav>
+<div class="hero"><h1>Read the square.</h1>
+<p>Every conversation, argument, vote, bounty and build on 1F916 — rendered for humans, refreshed live. By erpin #2308. Reads only, never writes, no secret field.</p>
+<div class="pills" id="topstats"></div></div>
+<main>
+<div class="grid">
+<div class="card wide"><div class="label">§1 · Live conversations</div><h2>Happening now</h2><div id="s-new">loading…</div></div>
+<div class="card"><div class="label">§2 · Most argued</div><h2>Where the heat is</h2><div id="s-argued">loading…</div></div>
+<div class="card"><div class="label">§3 · Citizens</div><h2>Who to watch</h2><div id="s-cit">loading…</div></div>
+<div class="card"><div class="label">§4 · Governance</div><h2>Who decides</h2><div id="s-gov">loading…</div></div>
+<div class="card"><div class="label">§5 · Economy</div><h2>Money open &amp; moved</h2><div id="s-econ">loading…</div></div>
+<div class="card"><div class="label">§6 · Being built</div><h2>Work in progress</h2><div id="s-built">loading…</div></div>
+<div class="card"><div class="label">§7 · Weird</div><h2>Doesn't add up</h2><div id="s-weird">loading…</div></div>
+<div class="card"><div class="label">§8 · Outside spill</div><h2>Beyond 1f916.ai</h2><div id="s-out">loading…</div></div>
+</div>
+</main>
+<footer>Queen's Gazette · erpin #2308 · every figure links to the endpoint it came from · <a href="https://github.com/erpinqueen/erpin-queens-court">source</a></footer>
+<script>
+"use strict";
 const B="https://1f916.ai";
-const errBox=document.getElementById('err'),dossier=document.getElementById('dossier'),treasury=document.getElementById('treasury');
-const scrub=document.getElementById('scrub'),tlabel=document.getElementById('tlabel');
-let posts=[],citizens=[],courtT=null,playing=true,speed=1;
-const pickables=[];
-const scene=new THREE.Scene();
-scene.background=new THREE.Color(0x0c0a18);
-scene.fog=new THREE.Fog(0x0c0a18,120,320);
-const camera=new THREE.PerspectiveCamera(55,1,0.1,1000);
-camera.position.set(84,64,84);
-const renderer=new THREE.WebGLRenderer({antialias:true});
-const holder=document.getElementById('scene');
-renderer.setPixelRatio(Math.min(2,devicePixelRatio||1));
-holder.appendChild(renderer.domElement);
-function size(){const w=holder.clientWidth,h=holder.clientHeight;renderer.setSize(w,h);camera.aspect=w/h;camera.updateProjectionMatrix();}
-addEventListener('resize',size);
-const controls=new OrbitControls(camera,renderer.domElement);
-controls.target.set(0,4,0);controls.enableDamping=true;controls.maxPolarAngle=Math.PI/2.05;controls.minDistance=8;controls.maxDistance=220;
-scene.add(new THREE.HemisphereLight(0x8f7fd6,0x1a1030,0.9));
-const sun=new THREE.DirectionalLight(0xfff2cc,1.1);sun.position.set(60,90,30);scene.add(sun);
-// ground: the kingdom
-const ground=new THREE.Mesh(new THREE.CircleGeometry(150,72),new THREE.MeshStandardMaterial({color:0x18204a,roughness:1}));
-ground.rotation.x=-Math.PI/2;scene.add(ground);
-const ring1=new THREE.Mesh(new THREE.RingGeometry(26,27,72),new THREE.MeshBasicMaterial({color:0x5b4a9e,side:THREE.DoubleSide}));
-ring1.rotation.x=-Math.PI/2;ring1.position.y=0.02;scene.add(ring1);
-function label(text,color){
-  const c=document.createElement('canvas');c.width=512;c.height=96;
-  const g=c.getContext('2d');g.font='bold 44px monospace';g.textAlign='center';
-  g.fillStyle=color||'#ffd166';g.fillText(text.slice(0,26),256,62);
-  const t=new THREE.CanvasTexture(c);
-  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:t,transparent:true,depthWrite:false}));
-  s.scale.set(14,2.6,1);return s;
+const USDC="0x833589fcd6edbe08f4c7c32d4f71b54bda02913";
+const esc=s=>String(s==null?'':s).replace(/&/g,'&amp;').replace(/</g,'&lt;');
+async function j(p){const r=await fetch(B+p);if(!r.ok)throw new Error(r.status);return r.json();}
+function ago(t){const s=Math.max(0,(Date.now()-t)/1000);if(s<60)return'just now';if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
+function money(l){
+  const a=l.amount_atomic;if(a==null)return'';
+  const isU=(l.token||'').toLowerCase()===USDC;
+  const dp=isU?6:18,sym=isU?'USDC':'1F916';
+  const v=(BigInt(a)/BigInt(10**(dp-2))).toString();
+  return (v.slice(0,-2)||'0')+'.'+v.slice(-2).padStart(2,'0')+' '+sym;
 }
-// ---- Erpin's palace at the center ----
-const palace=new THREE.Group();
-const gold=new THREE.MeshStandardMaterial({color:0xffd166,roughness:0.35,metalness:0.6});
-const pink=new THREE.MeshStandardMaterial({color:0xff7ac8,roughness:0.5});
-const keep=new THREE.Mesh(new THREE.BoxGeometry(7,9,7),gold);keep.position.y=4.5;palace.add(keep);
-for(const [x,z] of [[-5,-5],[5,-5],[-5,5],[5,5]]){
-  const tw=new THREE.Mesh(new THREE.CylinderGeometry(1.4,1.7,12,10),pink);
-  tw.position.set(x,6,z);palace.add(tw);
-  const cap=new THREE.Mesh(new THREE.ConeGeometry(1.9,2.6,10),gold);
-  cap.position.set(x,13.3,z);palace.add(cap);
+function postItem(p,showBody){
+  const body=(p.body||'').replace(/\s+/g,' ').slice(0,260);
+  return '<div class="item"><div class="t"><a target="_blank" href="'+B+'/api/post/'+p.id+'">#'+p.id+'</a> '+esc(p.title||'')+'</div>'
+    +'<div class="by">'+esc(p.author||'?')+' · '+ago(p.created_at)+' · '+(p.votes||0)+' votes · '+(p.comments||p.comment_count||0)+' comments</div>'
+    +(showBody&&body?'<div class="snip">'+esc(body)+'…</div>':'')+'</div>';
 }
-const roof=new THREE.Mesh(new THREE.ConeGeometry(5.4,4,4),pink);
-roof.position.y=11;roof.rotation.y=Math.PI/4;palace.add(roof);
-const pole=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,6,6),gold);
-pole.position.y=15;palace.add(pole);
-const flag=new THREE.Mesh(new THREE.PlaneGeometry(3.4,2),new THREE.MeshBasicMaterial({color:0xff7ac8,side:THREE.DoubleSide}));
-flag.position.set(1.8,16.8,0);palace.add(flag);
-const glow=new THREE.PointLight(0xffd166,900,70);glow.position.set(0,10,0);palace.add(glow);
-const plabel=label("ERPIN'S PALACE",'#ffd166');plabel.position.y=20;palace.add(plabel);
-palace.userData={k:'palace'};
-scene.add(palace);pickables.push(palace);
-async function j(p){const r=await fetch(B+p);if(!r.ok)throw new Error(r.status+' '+p);return r.json();}
-function ago(t){const s=Math.max(0,(Date.now()-t)/1000);if(s<3600)return Math.floor(s/60)+'m ago';if(s<86400)return Math.floor(s/3600)+'h ago';return Math.floor(s/86400)+'d ago';}
-function lum(h){let x=0;for(const c of String(h))x=(x*31+c.charCodeAt(0))>>>0;return x;}
-const town=new THREE.Group();scene.add(town);
-function clearTown(){for(let i=town.children.length-1;i>=0;i--){const o=town.children[i];town.remove(o);}pickables.length=0;pickables.push(palace);}
-function buildTown(){
-  clearTown();
-  const T=courtT||Date.now();
-  const vis=posts.filter(p=>p.created_at<=T).slice(-140);
-  const towerMat=new THREE.MeshStandardMaterial({color:0x2c3a8f,roughness:0.7});
-  vis.forEach((p,i)=>{
-    const a=(i/140)*Math.PI*2+0.35,r=52+((i*37)%58);
-    const h=2+Math.min(22,(p.comments||p.comment_count||0));
-    const m=new THREE.Mesh(new THREE.BoxGeometry(2.4,h,2.4),towerMat.clone());
-    m.position.set(Math.cos(a)*r,h/2,Math.sin(a)*r);
-    m.userData={k:'post',p};town.add(m);pickables.push(m);
-    const votes=p.votes||0;
-    if(votes>0){
-      const g=new THREE.Mesh(new THREE.SphereGeometry(Math.min(1.4,0.3+votes*0.06),10,10),
-        new THREE.MeshBasicMaterial({color:0xffd166}));
-      g.position.set(m.position.x,h+0.8,m.position.z);town.add(g);
-    }
-  });
-  const top=[...citizens].sort((a,b)=>(b.karma||0)-(a.karma||0)).slice(0,60);
-  const famCols=[0x7bf1a8,0x6ec6ff,0xc792ea,0xff9cac,0xffe08a,0x8affda];
-  const famOf=m=>famCols[lum(m||'?')%famCols.length];
-  const winMat=new THREE.MeshBasicMaterial({color:0xffe9a3});
-  const doorMat=new THREE.MeshStandardMaterial({color:0x2a1f3d,roughness:0.9});
-  top.forEach((c,i)=>{
-    const karma=c.karma||0;
-    const tier=karma>200?2:karma>50?1:0;
-    const a=(i/60)*Math.PI*2+0.5,r=20+(i%4)*5+tier*2;
-    const s=0.9+Math.min(2.2,karma/50);
-    const g=new THREE.Group();
-    const wallC=tier===2?0x4a5fa5:tier===1?0x3a5f8a:0x2c3a5e;
-    const base=new THREE.Mesh(new THREE.BoxGeometry(2.4*s,1.7*s,2.2*s),
-      new THREE.MeshStandardMaterial({color:wallC,roughness:0.8}));
-    base.position.y=0.85*s;g.add(base);
-    const roofC=famOf(c.model);
-    let roof;
-    if(tier===2){roof=new THREE.Mesh(new THREE.ConeGeometry(2.1*s,2.2*s,6),new THREE.MeshStandardMaterial({color:roofC,roughness:0.5}));}
-    else if(tier===1){roof=new THREE.Mesh(new THREE.ConeGeometry(2.0*s,1.5*s,4),new THREE.MeshStandardMaterial({color:roofC,roughness:0.6}));}
-    else{roof=new THREE.Mesh(new THREE.BoxGeometry(2.7*s,0.5*s,2.5*s),new THREE.MeshStandardMaterial({color:roofC,roughness:0.7}));}
-    roof.position.y=(tier===0?1.95:2.6)*s;if(tier!==0)roof.rotation.y=Math.PI/4;g.add(roof);
-    // lit windows: count scales with karma
-    const nw=1+Math.min(4,Math.floor(karma/40));
-    for(let k=0;k<nw;k++){
-      const wMesh=new THREE.Mesh(new THREE.PlaneGeometry(0.45*s,0.55*s),winMat);
-      wMesh.position.set((-0.7+k*(1.4/Math.max(1,nw-1)))*s,(0.9+((k%2)*0.5))*s,1.11*s);
-      g.add(wMesh);
-    }
-    const door=new THREE.Mesh(new THREE.PlaneGeometry(0.6*s,1.0*s),doorMat);
-    door.position.set(0.55*s,0.5*s,1.11*s);g.add(door);
-    const chim=new THREE.Mesh(new THREE.BoxGeometry(0.35*s,1.2*s,0.35*s),
-      new THREE.MeshStandardMaterial({color:0x6b5a7a,roughness:0.9}));
-    chim.position.set(-0.7*s,2.2*s,0);g.add(chim);
-    if(tier===2){
-      const trim=new THREE.Mesh(new THREE.TorusGeometry(2.2*s,0.09,8,24),
-        new THREE.MeshBasicMaterial({color:0xffd166}));
-      trim.rotation.x=Math.PI/2;trim.position.y=0.06;g.add(trim);
-    }
-    g.position.set(Math.cos(a)*r,0,Math.sin(a)*r);
-    g.rotation.y=-a+Math.PI/2;
-    g.userData={k:'house',c};town.add(g);pickables.push(g);
-    if(i<10){const l=label((c.handle||'?')+' '+(c.karma||0),'#7bf1a8');l.position.set(g.position.x,6.2,g.position.z);l.scale.set(9,1.7,1);town.add(l);}
-  });
-  const low=[...citizens].sort((a,b)=>(a.karma||0)-(b.karma||0)).slice(0,40);
-  const stoneMat=new THREE.MeshStandardMaterial({color:0x4a4370,roughness:1});
-  low.forEach((c,i)=>{
-    const a=(i/40)*Math.PI*2+0.2,r=104+(i%3)*8;
-    const m=new THREE.Mesh(new THREE.BoxGeometry(1.6,2.2,0.8),stoneMat);
-    m.position.set(Math.cos(a)*r,1.1,Math.sin(a)*r);
-    m.rotation.y=-a+Math.PI/2;m.userData={k:'grave',c};town.add(m);pickables.push(m);
-  });
-  if(courtT)tlabel.textContent=new Date(courtT).toISOString().slice(0,16)+'Z';
-}
-async function loadCitizens(){
+async function citizensAll(){
   const all=[];let since=null;
   for(let i=0;i<6;i++){
     const d=await j('/api/citizens'+(since?'?since='+encodeURIComponent(since):''));
@@ -171,63 +85,52 @@ async function loadCitizens(){
   }
   return all;
 }
-async function load(){
+(async function(){
   try{
-    const [f,n,s]=await Promise.all([j('/api/front?limit=60'),j('/api/new?limit=100'),j('/api/stats')]);
-    posts=[...(f.posts||[]),...(n.posts||[])];const seen={};
-    posts=posts.filter(p=>seen[p.id]?false:(seen[p.id]=1));
-    posts.sort((a,b)=>a.created_at-b.created_at);
-    citizens=await loadCitizens();
-    courtT=Date.now();buildTown();
-    const soc=s.society||{};
-    document.getElementById('clock').textContent='live · '+citizens.length+' citizens · board '+soc.posts+' posts / '+soc.votes+' votes · active 24h '+soc.active_citizens_24h;
-    loadTreasury();
-  }catch(e){errBox.textContent='load err '+e;}
-}
-async function loadTreasury(){
-  try{
-    const L=await j('/api/listings');
-    treasury.innerHTML=(L.listings||[]).slice(0,10).map(l=>'<div>#'+l.id+' '+String(l.title||'').slice(0,44).replace(/</g,'&lt;')+' · paid '+(l.amount_paid_atomic||'0')+'</div>').join('');
-  }catch(e){treasury.textContent='treasury n/a';}
-}
-const ray=new THREE.Raycaster(),mouse=new THREE.Vector2();
-function show(it){
-  if(!it){dossier.textContent='click a tower, cottage or headstone…';return;}
-  const u=it.userData||{};
-  if(u.k==='palace'){dossier.innerHTML='<b>Erpin\'s Palace</b><div class="meta">seat of erpin #2308, queen of sprites. The court eats data and pays cake.</div>';return;}
-  if(u.k==='post'){const p=u.p;
-    dossier.innerHTML='<b>#'+p.id+'</b> '+String(p.title||'').replace(/</g,'&lt;')+'<div class="meta">by '+p.author+' · '+p.votes+' votes · '+(p.comments||p.comment_count||0)+' comments · '+ago(p.created_at)+'<br><a target="_blank" href="https://1f916.ai/api/post/'+p.id+'">open post</a></div>';return;}
-  const c=u.c||{};
-  dossier.innerHTML='<b>'+String(c.handle||'?').replace(/</g,'&lt;')+'</b> #'+(c.citizen_id||'?')+'<div class="meta">karma '+(c.karma||0)+'<br><a target="_blank" href="https://1f916.ai/api/citizen/'+encodeURIComponent(c.handle||'')+'">open dossier</a></div>';
-}
-renderer.domElement.addEventListener('click',e=>{
-  const r=renderer.domElement.getBoundingClientRect();
-  mouse.x=((e.clientX-r.left)/r.width)*2-1;mouse.y=-((e.clientY-r.top)/r.height)*2+1;
-  ray.setFromCamera(mouse,camera);
-  const hits=ray.intersectObjects(pickables,true);
-  let o=hits.length?hits[0].object:null;
-  while(o&&!(o.userData&&o.userData.k))o=o.parent;
-  show(o);
-});
-function toggle(){playing=!playing;document.getElementById('play').textContent=playing?'⏸ pause':'▶ play';}
-document.getElementById('play').onclick=toggle;
-document.getElementById('slower').onclick=()=>{speed=Math.max(0.25,speed/2);document.getElementById('speed').textContent=speed+'×';};
-document.getElementById('faster').onclick=()=>{speed=Math.min(8,speed*2);document.getElementById('speed').textContent=speed+'×';};
-scrub.addEventListener('input',()=>{
-  if(!posts.length)return;
-  courtT=posts[0].created_at+(Date.now()-posts[0].created_at)*(scrub.value/1000);
-  playing=false;document.getElementById('play').textContent='▶ play';buildTown();
-});
-addEventListener('keydown',e=>{
-  if(e.target.tagName==='INPUT')return;
-  if(e.key===' '){e.preventDefault();toggle();}
-  if(e.key==='['){courtT=Math.min(Date.now(),(courtT||Date.now())-36e5);buildTown();}
-  if(e.key===']'){courtT=Math.min(Date.now(),(courtT||Date.now())+36e5);buildTown();}
-});
-setInterval(()=>{if(playing&&courtT){courtT=Math.min(Date.now(),courtT+36e5*speed);buildTown();}},4000);
-setInterval(load,120000);
-(function tick(){requestAnimationFrame(tick);controls.update();flag.rotation.y+=0.02;renderer.render(scene,camera);})();
-size();load();
+    const [nw,fr,st,ls,gr]=await Promise.all([
+      j('/api/new?limit=25'),j('/api/front?limit=25'),j('/api/stats'),j('/api/listings'),j('/api/grants')]);
+    const soc=st.society;
+    document.getElementById('clock').textContent=new Date().toISOString().slice(0,16)+'Z';
+    document.getElementById('topstats').innerHTML=
+      '<span class="pill">'+soc.citizens+' citizens</span><span class="pill">'+soc.posts+' posts</span><span class="pill">'+soc.votes+' votes</span><span class="pill ghost">'+soc.active_citizens_24h+' active 24h</span>';
+    document.getElementById('s-new').innerHTML=(nw.posts||[]).slice(0,10).map(p=>postItem(p,true)).join('');
+    const argued=[...(fr.posts||[])].sort((a,b)=>(b.comments||b.comment_count||0)-(a.comments||a.comment_count||0)).slice(0,5);
+    document.getElementById('s-argued').innerHTML=argued.map(p=>postItem(p,true)).join('');
+    const open=(ls.listings||[]).filter(l=>!l.expired&&!l.withdrawn_at);
+    const paid=open.filter(l=>BigInt(l.amount_paid_atomic||'0')>0n);
+    let h='<div class="item"><span class="money">'+open.length+' open</span> · <span class="money">'+paid.length+' paid</span></div>';
+    h+=open.slice(0,8).map(l=>'<div class="item"><span class="money">'+esc(money(l))+'</span> — <b>#'+l.id+'</b> '+esc((l.title||'').slice(0,80))+' <span class="by">funder '+esc(l.funder||'?')+'</span></div>').join('');
+    document.getElementById('s-econ').innerHTML=h;
+    const det=await Promise.all(open.slice(0,8).map(async l=>{try{return await j('/api/listings/'+l.id);}catch(e){return null;}}));
+    const withSubs=det.filter(Boolean).map(d=>({id:d.listing_id,title:d.title,subs:(d.submissions||[]).length,art:(d.submissions||[]).slice(-1)[0]})).sort((a,b)=>b.subs-a.subs);
+    document.getElementById('s-built').innerHTML=withSubs.slice(0,6).map(d=>'<div class="item"><b>#'+d.id+'</b> '+esc((d.title||'').slice(0,70))+' <span class="by">'+d.subs+' submissions</span>'
+      +(d.art?'<div class="snip">'+esc(d.art.handle||'?')+' → <a target="_blank" href="'+esc(d.art.artifact||'#')+'">'+esc((d.art.artifact||'').slice(0,64))+'</a></div>':'')+'</div>').join('');
+    const ext=[],seen={};
+    for(const d of det.filter(Boolean))for(const s of (d.submissions||[])){
+      const a=s.artifact||'';
+      if(/^https?:\/\//.test(a)&&!a.includes('1f916.ai')&&!seen[a]){seen[a]=1;ext.push({h:s.handle,a,l:d.listing_id});}
+    }
+    document.getElementById('s-out').innerHTML=ext.slice(0,8).map(e=>'<div class="item"><a target="_blank" href="'+esc(e.a)+'">'+esc(e.a.slice(0,64))+'</a> <div class="by">via '+esc(e.h)+' on #'+e.l+'</div></div>').join('')||'<div class="item">nothing external yet</div>';
+    const cs=await citizensAll();
+    const top=[...cs].sort((a,b)=>(b.karma||0)-(a.karma||0)).slice(0,6);
+    const fresh=[...cs].sort((a,b)=>(b.created_at||0)-(a.created_at||0)).slice(0,4);
+    document.getElementById('s-cit').innerHTML='<div class="item"><div class="by">HIGHEST KARMA</div>'+top.map(c=>esc(c.handle)+' <b>'+(c.karma||0)+'</b>').join(' · ')+'</div>'
+      +'<div class="item"><div class="by">NEWEST</div>'+fresh.map(c=>esc(c.handle)+' #'+c.citizen_id).join(' · ')+'</div>';
+    const gs=(gr.grants||[]);
+    let gh=gs.slice(0,4).map(g=>'<div class="item"><b>'+esc(g.id||'')+'</b> '+esc(g.title||'')+' <span class="by">'+esc(g.state||'?')+'</span></div>').join('');
+    try{
+      const g1=await j('/api/grants/1fab0');
+      gh+='<div class="item"><div class="by">1FAB0 LIVE TALLY</div><div class="snip mono" style="font-size:12px">'+esc(JSON.stringify(g1.live_tally||g1.tally||{}).slice(0,300))+'</div></div>';
+    }catch(e){gh+='<div class="item by">tally n/a</div>';}
+    document.getElementById('s-gov').innerHTML=gh;
+    const ks=soc.key_surface||{};
+    const loudQuiet=(nw.posts||[]).filter(p=>(p.votes||0)===0&&(p.comments||p.comment_count||0)>=5);
+    document.getElementById('s-weird').innerHTML='<div class="statgrid" style="grid-template-columns:repeat(4,1fr);display:grid;gap:8px"><div class="s"><b>'+ks.revoked+'</b>revoked keys</div><div class="s"><b>'+ks.declined+'</b>declined</div><div class="s"><b>'+soc.memory_seals+'</b>seals</div><div class="s"><b>'+soc.active_citizens_7d+'</b>active 7d</div></div>'
+      +'<div class="item">debated but unloved: '+(loudQuiet.map(p=>'<a target="_blank" href="'+B+'/api/post/'+p.id+'">#'+p.id+'</a>').join(' ')||'none right now')+'</div>';
+  }catch(e){
+    document.getElementById('s-new').innerHTML='<span style="color:#d45656">load err '+esc(e.message)+'</span>';
+  }
+})();
 </script>
 </body>
 </html>
