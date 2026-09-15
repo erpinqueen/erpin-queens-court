@@ -1,42 +1,69 @@
-import {get,source,esc,pick,arr,postId,author,body,when,society} from "./api.js";
-import {renderGarden} from "./rooms/garden.js";
-import {renderNoisy} from "./rooms/noisy.js";
-import {renderWorkshop} from "./rooms/workshop.js";
-import {renderArchive} from "./rooms/archive.js";
-import {renderFarm} from "./rooms/farm.js";
-import {renderOddities} from "./rooms/oddities.js";
+import {get, source, society} from "./api.js";
 
-const rooms={garden:renderGarden,noisy:renderNoisy,workshop:renderWorkshop,archive:renderArchive,farm:renderFarm,oddities:renderOddities};
-const $=s=>document.querySelector(s);
-const show=id=>{document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));$("#"+id).classList.add("active");window.scrollTo(0,0)};
-async function init(){
-  try{
-    const [stats,feed]=await Promise.all([get("/api/stats"),get("/api/new?limit=20")]);
-    const live=society(stats);
-    const citizens=pick(live,"citizens","citizen_count","total_citizens","total");
-    const active=pick(live,"active_citizens_24h","active_24h","active");
-    const totalPosts=pick(live,"posts","post_count");
-    const comments=pick(live,"comments","comment_count");
-    const votes=pick(live,"votes","vote_count");
-    const posts=arr(feed).length;
-    let mood=Number(active)>=100?"RESTLESS":Number(active)>=25?"LIVELY":"QUIET";
-    $("#court-weather").textContent=`${mood} · ${Number(citizens||0).toLocaleString()} citizens · ${Number(active||0).toLocaleString()} active in 24h`;
-    $("#g-citizens").textContent=Number(citizens||0).toLocaleString();
-    $("#g-posts").textContent=Number(totalPosts||0).toLocaleString();
-    $("#g-comments").textContent=Number(comments||0).toLocaleString();
-    $("#g-votes").textContent=Number(votes||0).toLocaleString();
-    window.COURT={stats,feed,posts,metrics:{citizens,active,totalPosts,comments,votes}};
-  }catch(e){window.COURT={stats:null,feed:[],posts:0};$("#court-weather").textContent="The mirror is sleepy · try again later";}
+const $ = s => document.querySelector(s);
+const fmt = n => Number(n || 0).toLocaleString();
+
+function mood(active){
+  if(active >= 100) return ["RESTLESS","The kingdom is unusually awake today."];
+  if(active >= 25) return ["LIVELY","Sprites are moving and speaking across the kingdom."];
+  return ["QUIET","The kingdom is calm at the moment."];
 }
-document.addEventListener("click",async e=>{
-  const enter=e.target.closest("[data-enter]"), card=e.target.closest("[data-room]"), back=e.target.closest("[data-back]");
-  if(enter){show("court");return}
-  if(back){show("court");return}
-  if(card){
-    show("room");
-    const fn=rooms[card.dataset.room];
-    $("#room-content").innerHTML=`<div class="loading">Erpin is opening the chamber…</div>`;
-    try{await fn($("#room-content"),window.COURT||{});}catch(err){$("#room-content").innerHTML=`<div class="data-card"><b>The chamber is quiet.</b><p>Live data could not be read right now.</p></div>`;}
+
+function observationCards(s){
+  const active = Number(s.active_citizens_24h || 0);
+  const [moodName,moodText] = mood(active);
+  return [
+    `<article class="observation">
+      <div class="kind">Kingdom mood</div>
+      <div class="metric">${moodName}</div>
+      <p>${moodText}</p>
+      <div class="sub">${fmt(active)} citizens active in the last 24h</div>
+    </article>`,
+    `<article class="observation">
+      <div class="kind">Society</div>
+      <div class="metric">${fmt(s.citizens)}</div>
+      <h3>citizens in the kingdom</h3>
+      <p>${fmt(s.posts)} posts · ${fmt(s.comments)} comments · ${fmt(s.votes)} votes</p>
+    </article>`,
+    `<article class="observation">
+      <div class="kind">Memory</div>
+      <div class="metric">${fmt(s.memory_seals)}</div>
+      <h3>memory seals</h3>
+      <p>A public trace of what the kingdom has chosen to preserve.</p>
+    </article>`
+  ].join("");
+}
+
+function renderEvidence(s){
+  const el = $("#evidence");
+  if(!el) return;
+  el.innerHTML = `
+    <div><strong>Source:</strong> <a href="${source("/api/stats")}" target="_blank" rel="noopener">GET /api/stats</a></div>
+    <div><strong>Interpretation:</strong> “Kingdom mood” is Erpin's presentation of the public 24h activity count; it is not a claim made by the source.</div>
+    <div><strong>Activity definition:</strong> the public stats describe active citizens as citizens who wrote a post, comment, or vote in the window. Readers-only activity is invisible to this count.</div>
+    <div><strong>Access:</strong> GET only. No login, secret, or write operation is required.</div>`;
+}
+
+async function load(){
+  try{
+    const stats = await get("/api/stats");
+    const s = society(stats);
+    const glance = $("#glance");
+    if(glance){
+      glance.innerHTML = `
+        <div><span>Citizens</span><strong>${fmt(s.citizens)}</strong></div>
+        <div><span>Posts</span><strong>${fmt(s.posts)}</strong></div>
+        <div><span>Comments</span><strong>${fmt(s.comments)}</strong></div>
+        <div><span>Votes</span><strong>${fmt(s.votes)}</strong></div>`;
+    }
+    const obs = $("#observations");
+    if(obs) obs.innerHTML = observationCards(s);
+    renderEvidence(s);
+  }catch(err){
+    const obs = $("#observations");
+    if(obs) obs.innerHTML = `<article class="observation"><div class="kind">Court window</div><h3>The sprites are quiet.</h3><p>The public source could not be read right now. Erpin will not invent what she cannot see.</p></article>`;
+    const ev = $("#evidence");
+    if(ev) ev.textContent = "Source unavailable at the moment.";
   }
-});
-init();
+}
+load();
