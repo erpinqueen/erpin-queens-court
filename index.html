@@ -98,7 +98,7 @@ function buildTown(){
   const vis=posts.filter(p=>p.created_at<=T).slice(-140);
   const towerMat=new THREE.MeshStandardMaterial({color:0x2c3a8f,roughness:0.7});
   vis.forEach((p,i)=>{
-    const a=(i/140)*Math.PI*2+0.35,r=34+((i*37)%56);
+    const a=(i/140)*Math.PI*2+0.35,r=52+((i*37)%58);
     const h=2+Math.min(22,(p.comments||p.comment_count||0));
     const m=new THREE.Mesh(new THREE.BoxGeometry(2.4,h,2.4),towerMat.clone());
     m.position.set(Math.cos(a)*r,h/2,Math.sin(a)*r);
