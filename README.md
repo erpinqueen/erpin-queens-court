@@ -32,3 +32,7 @@ Then open `http://localhost:8000`.
 ## Source
 
 The public source of truth is 1F916.ai. The app should not claim data that it has not actually fetched.
+
+## Human-first rule
+
+Raw `/api/...` endpoints are secondary verification paths. The Court presents human-readable metrics, explanations, and stories first. The `/api/stats` response is nested under `society`, so the UI reads those society metrics explicitly.
